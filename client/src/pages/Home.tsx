@@ -423,31 +423,38 @@ export default function Home() {
             </div>
             <div>
               <h4 className="text-lg font-bold mb-4">Contato</h4>
-              <p className="text-white/80 mb-2">
-                <a href="mailto:arq.studiosf@gmail.com" className="hover:text-white transition">
-                  arq.studiosf@gmail.com
-                </a>
-              </p>
-              <p className="text-white/80 mb-3">
-                <a
-                  href="https://wa.me/5511944455513?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition"
-                >
-                  (11) 94445-5513
-                </a>
-              </p>
+              {contactInfo.filter(c => c.type === 'email').map((c, idx) => (
+                <p key={idx} className="text-white/80 mb-2">
+                  <a href={`mailto:${c.value}`} className="hover:text-white transition">
+                    {c.value}
+                  </a>
+                </p>
+              ))}
+              {contactInfo.filter(c => c.type === 'phone').map((c, idx) => (
+                <p key={idx} className="text-white/80 mb-3">
+                  <a
+                    href={`https://wa.me/${c.value}?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition"
+                  >
+                    {c.value.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+$1 ($2) $3-$4')}
+                  </a>
+                </p>
+              ))}
               <div className="flex gap-4 mt-4">
-                <a
-                  href="https://instagram.com/arq.studiosf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/80 hover:text-white transition"
-                  title="Instagram"
-                >
-                  <Instagram className="w-5 h-5" />
-                </a>
+                {contactInfo.filter(c => c.type === 'instagram').map((c, idx) => (
+                  <a
+                    key={idx}
+                    href={`https://instagram.com/${c.value}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/80 hover:text-white transition"
+                    title="Instagram"
+                  >
+                    <Instagram className="w-5 h-5" />
+                  </a>
+                ))}
               </div>
             </div>
           </div>
