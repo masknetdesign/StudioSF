@@ -83,12 +83,12 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <nav className="container flex items-center justify-between py-6">
           <div className="flex items-center gap-2">
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg">
-              SF
+            <div className="w-16 h-16 flex items-center justify-center">
+              <img src="/logo.png.png" alt="Studio SF Logo" className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-bold text-primary hidden sm:inline">Studio SF</span>
           </div>
-          
+
           {/* Desktop Menu */}
           <ul className="hidden md:flex gap-8 items-center">
             <li><a href="#services" className="text-foreground hover:text-primary transition">Serviços</a></li>
@@ -151,9 +151,8 @@ export default function Home() {
         {HERO_SLIDES.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100" : "opacity-0"
+              }`}
           >
             <img
               src={slide.image}
@@ -194,9 +193,8 @@ export default function Home() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition ${
-                index === currentSlide ? "bg-white w-8" : "bg-white/50"
-              }`}
+              className={`w-3 h-3 rounded-full transition ${index === currentSlide ? "bg-white w-8" : "bg-white/50"
+                }`}
               aria-label={`Ir para slide ${index + 1}`}
             />
           ))}
@@ -338,7 +336,12 @@ export default function Home() {
         <div className="container">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h4 className="text-lg font-bold mb-4">Studio SF</h4>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 flex items-center justify-center bg-white rounded-full p-1">
+                  <img src="/logo.png.png" alt="Studio SF Logo" className="w-full h-full object-contain" />
+                </div>
+                <h4 className="text-lg font-bold">Studio SF</h4>
+              </div>
               <p className="text-white/80">Arquitetura e Interiores com excelência e dedicação</p>
             </div>
             <div>
@@ -349,35 +352,35 @@ export default function Home() {
                 <li><a href="#services" className="hover:text-white transition">Consultorias</a></li>
               </ul>
             </div>
-          <div>
-            <h4 className="text-lg font-bold mb-4">Contato</h4>
-            <p className="text-white/80 mb-2">
-              <a href="mailto:arq.studiosf@gmail.com" className="hover:text-white transition">
-                arq.studiosf@gmail.com
-              </a>
-            </p>
-            <p className="text-white/80 mb-3">
-              <a
-                href="https://wa.me/5511944455513?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition"
-              >
-                (11) 94445-5513
-              </a>
-            </p>
-            <div className="flex gap-4 mt-4">
-              <a
-                href="https://instagram.com/arq.studiosf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/80 hover:text-white transition"
-                title="Instagram"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
+            <div>
+              <h4 className="text-lg font-bold mb-4">Contato</h4>
+              <p className="text-white/80 mb-2">
+                <a href="mailto:arq.studiosf@gmail.com" className="hover:text-white transition">
+                  arq.studiosf@gmail.com
+                </a>
+              </p>
+              <p className="text-white/80 mb-3">
+                <a
+                  href="https://wa.me/5511944455513?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition"
+                >
+                  (11) 94445-5513
+                </a>
+              </p>
+              <div className="flex gap-4 mt-4">
+                <a
+                  href="https://instagram.com/arq.studiosf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-white transition"
+                  title="Instagram"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+              </div>
             </div>
-          </div>
           </div>
 
           <div className="border-t border-white/20 pt-8">
