@@ -84,7 +84,7 @@ export default function Home() {
         <nav className="container flex items-center justify-between py-6">
           <div className="flex items-center gap-2">
             <div className="w-16 h-16 flex items-center justify-center">
-              <img src="/logo.png.png" alt="Studio SF Logo" className="w-full h-full object-contain" />
+              <img src="/logo.png" alt="Studio SF Logo" className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-bold text-primary hidden sm:inline">Studio SF</span>
           </div>
@@ -338,7 +338,7 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 flex items-center justify-center bg-white rounded-full p-1">
-                  <img src="/logo.png.png" alt="Studio SF Logo" className="w-full h-full object-contain" />
+                  <img src="/logo.png" alt="Studio SF Logo" className="w-full h-full object-contain" />
                 </div>
                 <h4 className="text-lg font-bold">Studio SF</h4>
               </div>
