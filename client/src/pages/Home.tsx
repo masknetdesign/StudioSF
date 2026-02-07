@@ -1,8 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, MapPin, Phone, Mail, Instagram, Menu, X, Home as HomeIcon, Building2, Ticket } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Phone, Mail, Instagram, Menu, X, Home as HomeIcon, Building2, Ticket, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+
+interface HeroSlide {
+  id: number;
+  title: string;
+  description: string;
+  image_url: string;
+}
+
+interface ServiceCategory {
+  id: string;
+  title: string;
+  icon_name: string;
+  services: string[];
+}
+
+interface ContactInfo {
+  type: string;
+  value: string;
+  label: string;
+}
 
 /**
  * Design Philosophy: Elegância Clássica com Modernidade Contida
@@ -12,85 +33,103 @@ import { useState, useEffect } from "react";
  * - Elementos: Linhas decorativas, ícones circulares, divisores visuais
  */
 
-const HERO_SLIDES = [
-  {
-    id: 1,
-    title: "Projetos de Arquitetura",
-    description: "Criamos espaços que refletem sua personalidade e necessidades",
-    image: "https://private-us-east-1.manuscdn.com/sessionFile/WETLG3HaaE62XRvek9vEQh/sandbox/gp75G469f3j64qfnBkr9qX-img-1_1770374871000_na1fn_aGVyby1hcmNoaXRlY3R1cmUtMDE.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvV0VUTEczSGFhRTYyWFJ2ZWs5dkVRaC9zYW5kYm94L2dwNzVHNDY5ZjNqNjRxZm5Ca3I5cVgtaW1nLTFfMTc3MDM3NDg3MTAwMF9uYTFmbl9hR1Z5YnkxaGNtTm9hWFJsWTNSMWNtVXRNREUucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=Tuei~4KfuSNENlj-AgN8622R5sz46O8AFWd69n4TMOnDUB2RB7pvgADMhIWqN9Fx5NWZRG327BTvGua52pNuqD7bzEU-iTiFMnieOjO6s3BE~U1LozXHFxsjOGhl12sNAfjSdQoVlxzxYhkwU7-Cis4oUbPLOnZOTMGXk3LLEEysFWoIov5-3rThcPPXZ3Tee~sYUDKHAW-DML71lYhzslmrd18T6NTknuesX9JEqjSWkiNG9bKKBEHHV8EazySKGhPKYMlBs0A1WXFZ0o6Gz~iBqnK9QPu7gdZ2XCcWgYwVSlHXKboKjr5IY8NCRZdjJz4oX8uTwmscOPgWKP3v1g__",
-  },
-  {
-    id: 2,
-    title: "Projetos de Interiores",
-    description: "Transformamos ambientes com design sofisticado e funcional",
-    image: "https://private-us-east-1.manuscdn.com/sessionFile/WETLG3HaaE62XRvek9vEQh/sandbox/gp75G469f3j64qfnBkr9qX-img-2_1770374873000_na1fn_aGVyby1hcmNoaXRlY3R1cmUtMDI.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvV0VUTEczSGFhRTYyWFJ2ZWs5dkVRaC9zYW5kYm94L2dwNzVHNDY5ZjNqNjRxZm5Ca3I5cVgtaW1nLTJfMTc3MDM3NDg3MzAwMF9uYTFmbl9hR1Z5YnkxaGNtTm9hWFJsWTNSMWNtVXRNREkucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=IJ9WE9UPdI8X6ZQzrhOAzVLKvLZE6HCodn6bZI1tqNSmgoDisVX-2x2d~M6PwhKkMDwdeL~I8IJpjfgE2KiL3sLBNI~paZcYPgBI~RlDvYNv2B8hxG6DjWv3ZuiQPrSb78ELMp5mXdWUph4kIM1Is7qjKJ~9g8944dralzTLM6BBit8C3TglIjiFrH0HGCSgfl-TDBk3ubUjVpY09D2489qE55qHDe6KaUGUef7CrYD52CoBVi4HOUBLVpjvc1~~nNKPAdvGLO-SGsVEo3Ok15iMUmP4n3uuKLCcLB8MCYXS1E6HLrcVFb6noJB4y7yNWjTAbmbZUiIayMBeBqdMow__",
-  },
-  {
-    id: 3,
-    title: "Consultorias Especializadas",
-    description: "Orientação profissional para seus projetos arquitetônicos",
-    image: "https://private-us-east-1.manuscdn.com/sessionFile/WETLG3HaaE62XRvek9vEQh/sandbox/gp75G469f3j64qfnBkr9qX-img-3_1770374871000_na1fn_aGVyby1hcmNoaXRlY3R1cmUtMDM.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvV0VUTEczSGFhRTYyWFJ2ZWs5dkVRaC9zYW5kYm94L2dwNzVHNDY5ZjNqNjRxZm5Ca3I5cVgtaW1nLTNfMTc3MDM3NDg3MTAwMF9uYTFmbl9hR1Z5YnkxaGNtTm9hWFJsWTNSMWNtVXRNRE0ucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=c8WZlcnfm8E3KCDpea7zCbiwvTQd27GkPiN1m7VLRBXaBaRUruWuPIKzkSd5nXabCkzPFGfsmWLxVPTl98SyXHpL3WdomELRT2lkV2t~glVZH16vfOeMdnqtUb4tokIcx~se0mallSOd1HcEwAOj~Hn7Xe3zuawHtrk6xrAKfqBGu2c8H8XTw3c3F5Phkub8Mk80zZcFpjEpew-MXleIajparcJrUV4LweKp7c4zTNfSMtFQ-knJPN1gWdhukCY-Nx1kuzvhGNml~YkP1iCCthJum6WDTQ79zEKe~h8w5YrlUO8xk9FCvGwvE77sx~vRn4vMB2leZcWYf3XV4W0rAA__",
-  },
-];
-
-const SERVICE_CATEGORIES = [
-  {
-    id: "residenciais",
-    title: "Residenciais",
-    icon: <HomeIcon className="w-5 h-5" />,
-    services: [
-      "Projetos de Arquitetura",
-      "Projetos de Interiores",
-      "Consultorias de Decoração",
-      "Vistoria de Entrega de Chaves"
-    ]
-  },
-  {
-    id: "comerciais",
-    title: "Comerciais",
-    icon: <Building2 className="w-5 h-5" />,
-    services: [
-      "Projetos para Franquias",
-      "Projetos para Lojas Pop-Up",
-      "Projetos para aprovação em Shoppings",
-      "Laudos Técnicos",
-      "Projetos de Prevenção e Combate a Incêndio",
-      "Emissão de AVCB/CLCB"
-    ]
-  },
-  {
-    id: "eventos",
-    title: "Eventos",
-    icon: <Ticket className="w-5 h-5" />,
-    services: [
-      "Projetos de Feiras e Eventos Temporários",
-      "Projetos de Cenografia",
-      "AVCB/CLCB para Eventos",
-      "Projetos de Prevenção de Incêndio para Eventos",
-      "Laudos Técnicos",
-      "Documentações e legalização de Eventos"
-    ]
-  }
-];
-
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 5000);
-    return () => clearInterval(timer);
+    async function fetchData() {
+      try {
+        setLoading(true);
+        // Fetch Hero Slides
+        const { data: slidesData } = await supabase
+          .from("hero_slides")
+          .select("*")
+          .order("order_index", { ascending: true });
+
+        if (slidesData) setSlides(slidesData);
+
+        // Fetch Categories and Services
+        const { data: categoriesData } = await supabase
+          .from("service_categories")
+          .select(`
+            id,
+            name,
+            slug,
+            icon,
+            services (
+              name,
+              order_index
+            )
+          `)
+          .order("order_index", { ascending: true });
+
+        if (categoriesData) {
+          const formattedCategories = categoriesData.map((cat: any) => ({
+            id: cat.slug,
+            title: cat.name,
+            icon_name: cat.icon,
+            services: cat.services
+              .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
+              .map((s: any) => s.name)
+          }));
+          setCategories(formattedCategories);
+        }
+
+        // Fetch Contact Info
+        const { data: contactData } = await supabase
+          .from("contact_info")
+          .select("*");
+
+        if (contactData) setContactInfo(contactData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
   }, []);
 
+  useEffect(() => {
+    if (slides.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    if (slides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    if (slides.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
+
+  const renderIcon = (iconName: string) => {
+    switch (iconName) {
+      case "Home": return <HomeIcon className="w-5 h-5" />;
+      case "Building2": return <Building2 className="w-5 h-5" />;
+      case "Ticket": return <Ticket className="w-5 h-5" />;
+      default: return <HomeIcon className="w-5 h-5" />;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-primary">
+        <Loader2 className="w-12 h-12 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -163,14 +202,14 @@ export default function Home() {
 
       {/* Hero Carousel */}
       <section className="relative h-96 md:h-screen overflow-hidden">
-        {HERO_SLIDES.map((slide, index) => (
+        {slides.map((slide, index) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100" : "opacity-0"
               }`}
           >
             <img
-              src={slide.image}
+              src={slide.image_url}
               alt={slide.title}
               className="w-full h-full object-cover"
             />
@@ -204,7 +243,7 @@ export default function Home() {
 
         {/* Slide Indicators */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-          {HERO_SLIDES.map((_, index) => (
+          {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
@@ -232,19 +271,19 @@ export default function Home() {
 
           <Tabs defaultValue="residenciais" className="w-full">
             <TabsList className="flex flex-wrap justify-center bg-transparent gap-4 mb-12 h-auto">
-              {SERVICE_CATEGORIES.map((category) => (
+              {categories.map((category) => (
                 <TabsTrigger
                   key={category.id}
                   value={category.id}
                   className="data-[state=active]:bg-primary data-[state=active]:text-white px-8 py-3 rounded-full border border-primary text-primary transition-all flex items-center gap-2 font-semibold"
                 >
-                  {category.icon}
+                  {renderIcon(category.icon_name)}
                   {category.title}
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            {SERVICE_CATEGORIES.map((category) => (
+            {categories.map((category) => (
               <TabsContent key={category.id} value={category.id} className="mt-0">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {category.services.map((service, idx) => (
@@ -312,22 +351,17 @@ export default function Home() {
                 <Phone className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-bold text-primary mb-2">Telefone</h3>
-              <a
-                href="https://wa.me/5511944455513?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline mb-2 block transition"
-              >
-                (11) 94445-5513
-              </a>
-              <a
-                href="https://wa.me/5511991400266?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline block transition"
-              >
-                (11) 99140-0266
-              </a>
+              {contactInfo.filter(c => c.type === 'phone').map((c, idx) => (
+                <a
+                  key={idx}
+                  href={`https://wa.me/${c.value}?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline mb-2 block transition"
+                >
+                  {c.value.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+$1 ($2) $3-$4')}
+                </a>
+              ))}
             </div>
 
             <div className="bg-white rounded-lg p-8 text-center border border-border hover:shadow-lg transition-shadow">
@@ -335,9 +369,11 @@ export default function Home() {
                 <Mail className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-bold text-primary mb-2">Email</h3>
-              <a href="mailto:arq.studiosf@gmail.com" className="text-primary hover:underline">
-                arq.studiosf@gmail.com
-              </a>
+              {contactInfo.filter(c => c.type === 'email').map((c, idx) => (
+                <a key={idx} href={`mailto:${c.value}`} className="text-primary hover:underline">
+                  {c.value}
+                </a>
+              ))}
             </div>
 
             <div className="bg-white rounded-lg p-8 text-center border border-border hover:shadow-lg transition-shadow">
@@ -346,15 +382,18 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-bold text-primary mb-2">Redes Sociais</h3>
               <div className="flex justify-center gap-4">
-                <a
-                  href="https://instagram.com/arq.studiosf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:text-secondary transition font-semibold"
-                  title="Instagram"
-                >
-                  @arq.studiosf
-                </a>
+                {contactInfo.filter(c => c.type === 'instagram').map((c, idx) => (
+                  <a
+                    key={idx}
+                    href={`https://instagram.com/${c.value}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-secondary transition font-semibold"
+                    title="Instagram"
+                  >
+                    @{c.value}
+                  </a>
+                ))}
               </div>
             </div>
           </div>
