@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, MapPin, Phone, Mail, Instagram, Menu, X } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronLeft, ChevronRight, MapPin, Phone, Mail, Instagram, Menu, X, Home as HomeIcon, Building2, Ticket } from "lucide-react";
 import { useState, useEffect } from "react";
 
 /**
@@ -31,31 +33,44 @@ const HERO_SLIDES = [
   },
 ];
 
-const SERVICES = [
+const SERVICE_CATEGORIES = [
   {
-    id: 1,
-    title: "Projeto de Arquitetura",
-    description: "Designs inovadores que combinam estética e funcionalidade",
-    icon: "architecture",
+    id: "residenciais",
+    title: "Residenciais",
+    icon: <HomeIcon className="w-5 h-5" />,
+    services: [
+      "Projetos de Arquitetura",
+      "Projetos de Interiores",
+      "Consultorias de Decoração",
+      "Vistoria de Entrega de Chaves"
+    ]
   },
   {
-    id: 2,
-    title: "Projeto de Interiores",
-    description: "Ambientes personalizados que refletem seu estilo de vida",
-    icon: "interior",
+    id: "comerciais",
+    title: "Comerciais",
+    icon: <Building2 className="w-5 h-5" />,
+    services: [
+      "Projetos para Franquias",
+      "Projetos para Lojas Pop-Up",
+      "Projetos para aprovação em Shoppings",
+      "Laudos Técnicos",
+      "Projetos de Prevenção e Combate a Incêndio",
+      "Emissão de AVCB/CLCB"
+    ]
   },
   {
-    id: 3,
-    title: "Consultorias",
-    description: "Orientação especializada para seus projetos",
-    icon: "consultation",
-  },
-  {
-    id: 4,
-    title: "Emissão de RRT",
-    description: "Documentação técnica e regularização profissional",
-    icon: "documentation",
-  },
+    id: "eventos",
+    title: "Eventos",
+    icon: <Ticket className="w-5 h-5" />,
+    services: [
+      "Projetos de Feiras e Eventos Temporários",
+      "Projetos de Cenografia",
+      "AVCB/CLCB para Eventos",
+      "Projetos de Prevenção de Incêndio para Eventos",
+      "Laudos Técnicos",
+      "Documentações e legalização de Eventos"
+    ]
+  }
 ];
 
 export default function Home() {
@@ -215,20 +230,35 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {SERVICES.map((service) => (
-              <div
-                key={service.id}
-                className="bg-white rounded-lg p-8 text-center hover:shadow-lg transition-shadow border border-border"
-              >
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <div className="w-8 h-8 bg-primary rounded-full" />
+          <Tabs defaultValue="residenciais" className="w-full">
+            <TabsList className="flex flex-wrap justify-center bg-transparent gap-4 mb-12 h-auto">
+              {SERVICE_CATEGORIES.map((category) => (
+                <TabsTrigger
+                  key={category.id}
+                  value={category.id}
+                  className="data-[state=active]:bg-primary data-[state=active]:text-white px-8 py-3 rounded-full border border-primary text-primary transition-all flex items-center gap-2 font-semibold"
+                >
+                  {category.icon}
+                  {category.title}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            {SERVICE_CATEGORIES.map((category) => (
+              <TabsContent key={category.id} value={category.id} className="mt-0">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {category.services.map((service, idx) => (
+                    <Card key={idx} className="hover:shadow-md transition-shadow border-l-4 border-l-primary h-full">
+                      <CardContent className="p-6 flex items-center gap-4">
+                        <div className="w-2 h-2 rounded-full bg-secondary shrink-0" />
+                        <span className="text-lg font-medium text-foreground">{service}</span>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-                <h3 className="text-xl font-bold text-primary mb-3">{service.title}</h3>
-                <p className="text-muted-foreground">{service.description}</p>
-              </div>
+              </TabsContent>
             ))}
-          </div>
+          </Tabs>
         </div>
       </section>
 
